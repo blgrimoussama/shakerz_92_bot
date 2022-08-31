@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block style %}
+        <style>
+            .participant, #total {
+                font-family: Orbitron;
+                color: #ffffff;
+            }
+        
+            .new, #subtotal {
+                font-family: Orbitron;
+                color: #0f0;
+            }
+        
+            .column {
+                width: 100%;
+                padding: 15px;
+            }
+
+            #corner {
+               position:absolute;
+               top:0;
+               right:0;
+                padding: 20px;
+              }
+        </style>
+{% endblock %}
+
+{% block corner %}
+    <div id="corner">
+        <span id="total">Total entries: {{data|length}}</span>
+        <br>
+        <span id="subtotal" style="float:right;"></span>
+       
+    </div>
+
+{% endblock %}
+
+{% block main %}
+    {% set bound = data|length // 21 %}
+    {% if (bound != data|length / 21) %}
+        {% set bound = bound + 1 %}
+    {% endif %}
+    {% for i in range(bound) %}
+        {% if (i != bound) %}
+            {% set participants = data[21*i:21*(i+1)] %}
+        {% else %}
+            {% set participants = data[21*i:] %}
+        {% endif %}
+        <div class='column' id='column-{{i}}' style='width: {{ 100 // bound }}%;float: left;'>
+            {% for participant in participants %}
+            <span class='participant' id={{participant}}>
+                {{ participant }}
+            </span>
+            <br>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block script %}
+<script>
+    var last_data, prev_last_data
+    news = []
+    const body = document.getElementsByTagName('body')[0];
+    body.addEventListener('click', function handleClick() {
+        newElements = document.getElementsByClassName("new");
+        setTimeout(() =>
+            {while (newElements.length > 0) {
+            newElements[0].className = 'participant'
+        }
+        news = [];
+        subtotal = document.getElementById('subtotal')
+        subtotal.innerHTML = ''}
+            , 1500);
+    });
+    setInterval(function() {
+        fetch('/data/{{ channel }}/{{ title }}.txt').then(
+            response => response.json()
+        ).then(
+            data => {
+                // console.log(last_data)
+                // console.log(data)
+                // console.log()
+                if (JSON.stringify(data) !== JSON.stringify(last_data)) {
+                    prev_last_data = last_data
+                    last_data = data
+                    data_length = data['participants'].length
+                    main = document.getElementById('parent')
+                    total = document.getElementById('total')
+                    // if (data_length > standard) {
+                    main.innerHTML = ''
+                    total.innerHTML = ''
+                    if (data_length > 0 && data['participants'][0] !== '') {
+                        standard = 21
+                        total.innerHTML = `Total entries: ${data_length}`
+                        bound = Math.floor(data_length / standard)
+                        if (data_length / standard == bound) {
+                            bound -= 1;
+                        }
+                        for (let index = 0; index <= bound; index++) {
+                            div = document.createElement('div')
+                            div.setAttribute('class', 'column')
+                            div.setAttribute('id', `column-${index}`)
+                            div.setAttribute('style', `width: ${Math.floor(100/(bound + 1))}%;float: left;`)
+                            if (index !== bound) {
+                                participants = data['participants'].slice(standard * index, standard * (index + 1))
+                            } else {
+                                participants = data['participants'].slice(standard * index)
+                            }
+                            participants.forEach(person => {
+                                var span = document.createElement('span')
+                                if (!(typeof prev_last_data === 'undefined')) {
+                                    if (prev_last_data['participants'].includes(person) && !(news.includes(person))) {
+                                        span.setAttribute('class', 'participant')
+                                    } else {
+                                        if (!(news.includes(person))) {
+                                            news.push(person)
+                                        }
+                                        console.log(news)
+                                        span.setAttribute('class', 'new')
+                                    }
+                                } else {
+                                    span.setAttribute('class', 'participant')
+                                }
+                                span.setAttribute('id', person)
+                                span.innerHTML = person
+                                div.appendChild(span)
+                                var br = document.createElement('br')
+                                div.appendChild(br)
+                            })
+                            main.appendChild(div)
+                        }
+                    } else {
+                        total.innerHTML = `Total entries: 0`
+                        div = document.createElement('div')
+                        div.setAttribute('class', 'column')
+                        div.setAttribute('id', 'column-0')
+                        span = document.createElement('span')
+                        span.setAttribute('class', 'participant')
+                        // span.setAttribute('id', 'Empty')
+                        span.setAttribute('style', 'color:#f00;')
+                        span.innerHTML = 'Oopsy! List is Empty, There is no Entries Yet!'
+                        news = [];
+                        div.appendChild(span)
+                        main.appendChild(div)
+                    }
+                    subtotal = document.getElementById('subtotal')
+                    subtotal.innerHTML = ((news.length > 0) ? `+${news.length}` : '')
+                }
+            }
+        )
+    }, 1000);
+</script>
+{% endblock %}

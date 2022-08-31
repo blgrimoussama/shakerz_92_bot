@@ -1,0 +1,72 @@
+{% extends "layout_2.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block main %}
+<!--     <div id='participants-1' class='participants'> -->
+    <div class='column' id='column-0'>
+        {% for participant in data %}
+        <span class='participant' id={{participant}}>
+            {{ participant }}
+        </span>
+        <br>
+        {% endfor %}
+    </div>
+    <script>
+        var last_data, prev_last_data
+        news = []
+        const body = document.getElementsByTagName('body')[0];
+        body.addEventListener('click', function handleClick() {
+            // newElements = JSON.parse(JSON.stringify(document.getElementsByClassName("new")));
+            newElements = document.getElementsByClassName("new");
+            console.log('previous', newElements)
+            // for (let index = 0; index <= newElements.length; index++) {
+            //     // news[index].setAttribute('style', 'color: #fff;')
+            //     console.log(index, newElements)
+            //     newElements[index].className = 'participant';
+            // }
+            while (newElements.length > 0) {
+                newElements[0].className = 'participant'
+            }
+            news = [];
+            // document.getElementsByClassName("new").forEach(
+            //     span =>
+            //         span.setAttribute('style', 'color: #fff;')
+            // )
+        });
+        setInterval(function() {
+            fetch('/data/{{ title }}.txt').then(
+                response => response.json()
+            ).then(
+                data => {
+                    if (JSON.stringify(data) !== JSON.stringify(last_data)) {
+                        prev_last_data = last_data
+                        last_data = data
+                        div = document.getElementById('column-0')
+                        div.innerHTML = ''
+                        data['participants'].forEach(person => {
+                            var span = document.createElement('span')
+                            if (!(typeof prev_last_data === 'undefined')) {
+                                if (prev_last_data['participants'].includes(person) && !(news.includes(person))) {
+                                    span.setAttribute('class', 'participant')
+                                } else {
+                                    news.push(person)
+                                    span.setAttribute('class', 'new')
+                                }
+                            } else {
+                                span.setAttribute('class', 'participant')
+                            }
+                            span.setAttribute('id', person)
+                            span.innerHTML = person
+                            div.appendChild(span)
+                            var br = document.createElement('br')
+                            div.appendChild(br)
+                        })
+                    }
+                }
+            )
+        }, 1000);
+    </script>
+{% endblock %}

@@ -1,0 +1,81 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    background-color: #000;
+    /* overflow: hidden; */
+}
+
+
+/* ::-webkit-scrollbar {
+    width: 1.1em;
+}
+
+::-webkit-scrollbar-track {
+    background: url("/static/Asset 6.png");
+    background-size: contain;
+    background-repeat: space;
+}
+
+::-webkit-scrollbar-thumb {
+    background: url("/static/Asset 10.png");
+    background-size: contain;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: url("/static/Asset 11.png");
+    background-size: contain;
+}
+ */
+
+::-webkit-scrollbar {
+    width: 1.1em;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: url("/static/thumb.png");
+    background-size: contain;
+    border-radius: 100vw;
+    border: .25em solid #33332d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: url("/static/hover.png");
+    background-size: contain;
+    border-color: #5c5c2e;
+}
+
+.container {
+    padding-top: 3rem;
+}
+
+main
+{
+    /* Scroll horizontally as needed */
+    overflow-x: auto;
+
+    /* Center contents */
+    text-align: center;
+}
+
+main img
+{
+    /* Constrain images on small screens */
+    height: 40%;
+}
+
+
+.participant {
+    font-family: Orbitron;
+    color: #ffffff;
+}
+
+.new {
+    font-family: Orbitron;
+    color: #0f0;
+}
+
+.column {
+    width: 100%;
+    padding: 15px;
+} 
